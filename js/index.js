@@ -6,72 +6,69 @@ var appCourses = "https://script.google.com/macros/s/AKfycbwfrQ3eHLKBaOHf_2bQQLU
 function edit(){
     $(location).attr('href', 'edit.html'+window.location.search);
 };
-function md2html(input_content) {
-
-
-      preview = "";
-      //content = input.value;
-      content = input_content;
-      //console.log(content);
-      [preprocessed_content, parse_result, StringSet] = html_preprocessing(content);
-      debug = StringSet;
-      for(var i=0;i<StringSet.length;i++){
-      switch(StringSet[i].property){
-        case "markdown_input":{
-          //console.log("markdown_input");
-      //					console.log(StringSet[i].data);
-          var html_results = markdown.toHTML(StringSet[i].data);
-          preview += html_results;
-          break;
-        }
-        case "system_cmd":{
-          //console.log("system_cmd");
-          break;
-        }
-        case "html":{
-          //console.log("html");
-      //					console.log(StringSet[i].data);
-          preview += StringSet[i].data;
-
-          break;
-        }
-        case "u2b":{
-          preview += StringSet[i].data;
-          break;
-        }
-        case "flowchart":{
-					console.log(StringSet[i].data);
-					tmp = StringSet[i].data;
-					var diagram = flowchart.parse(tmp);
-					$('#diagram').html('');
-					diagram.drawSVG('diagram');
-
-					preview += $('#diagram').html();
-					break;
-				}
-      }
-      }
-      return preview;
-}
 
 $(document).ready(function(){
-$('#diagram').hide();
-$('#content').html("loading...");
-var course_id = window.location.search.split("?")[1].split("=")[1];
-         console.log(course_id);
          $.get(appCourses,
 
              {
-                 CourseID:course_id,
-                 "command":"commandGetCourse"
+                 "command":"commandGetCoursesList"
              },
            function (data) {
-           //console.log("the result is :"+data);
-             title = data.split('$$')[0];
-             content = data.split('$$')[1];
-             var html_content = md2html(content,html_content);
-          //   console.log(html_content);
-             $('#blog_title').html(title);
-             $('#content').html(html_content);
+				//console.log(data);
+				var courses_text = data;
+				var courses_set = courses_text.split('||');
+				courses_set.pop();
+				for(course_id in courses_set){
+					var course = courses_set[course_id];
+					console.log(course);
+					var course_name = course.split('$$')[0];
+					var course_id = course.split('$$')[1];
+					var course_description = course.split('$$')[2];
+					var course_icon = course.split('$$')[3];
+					$('#course_div').append(var2content(course_name, course_id, course_description, course_icon));
+				}
            });
 });
+
+var var2content = function(course_name, course_id, course_description, course_icon){
+	var tmp_text = "<div class=\'col-xs-12 col-sm-6 col-md-4\'>\
+	<div class=\'course-listing\' >\
+		<div class=\'row\'>\
+			<a href=\"";
+			tmp_text+="course.html?CourseID="+course_id;
+			tmp_text+="\" data-role=\"course-box-link\ \" target=\"__blank\">\
+				<div class=\'col-lg-12\'>\
+					<div class=\'course-box-image-container\'>\
+						<img class=\'course-box-image\' src=\'";
+						tmp_text+=course_icon;
+						tmp_text+="\' role=\"presentation\">\
+					</div>\
+					<div class=\'course-listing-title\'>";
+					tmp_text+=course_name
+					tmp_text+="</div>\
+					<div class=\'col-xs-12 hidden\'>\
+						<div class=\'progressbar\'>\
+						<div class=\'progressbar-fill\'></div>\
+					</div>\
+          </div>\
+          <div class=\'course-listing-subtitle\'>";
+		  
+          tmp_text+=course_description;
+		  
+          tmp_text+="</div>\
+        </div>\
+      </a>\
+    </div>\
+    <div class=\'course-listing-extra-info col-xs-12\'>\
+      <div class=\'pull-left\'>\
+        <div class=\'small course-author-name\'>\
+          \
+        </div>\
+        \
+      </div>\
+      \
+\
+    </div></div></div>\
+";
+return tmp_text;
+}
