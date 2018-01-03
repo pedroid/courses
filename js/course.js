@@ -58,23 +58,54 @@ $(document).ready(function(){
 $('#diagram').hide();
 $('#content').html("loading...");
 var course_id = window.location.search.split("?")[1].split("=")[1];
-         console.log(course_id);
-         $.get(appCourses,
+         //console.log(course_id);
 
-             {
-                 CourseID:course_id,
-                 "command":"commandGetCourse"
-             },
-           function (data) {
-           //console.log("the result is :"+data);
-             title = data.split('$$')[0];
-             //	     $('#courseSidebar h2').html(title);
-	           $('#blog_title').html(title);
-             content = data.split('$$')[1];
-             var html_content = md2html(content,html_content);
-             //   console.log(html_content);
-             $('#content').html(html_content);
+           $.get(appBlogs,{
+              "command":"read",
+              "FileID":course_id,
+           },function(data){
+             console.log(data);
+             var CourseName = data.split('$$')[0];
+             $('#courseSidebar h2').html(CourseName);
+             var item_set = data.split('$$')[1].split('\n');
+             for(i in item_set){
+                var item = item_set[i];
+                switch(item.split('#').length){
+                  case 3://lecture
+                    var lecture_name_set = item.split('#')[2];
+                    var lecture_name;
+                    var lecture_link;
+                    var lecture_fileid;
+                    //console.log(lecture_name_set);
+                    if(lecture_name_set.split('()').length>1){
+                      lecture_name_tmp = lecture_name_set.split('(')[0];
+                      lecture_name = lecture_name_tmp.substring(1,lecture_name_tmp.length-1);
+                      lecture_link = '';
+                      lecture_fileid = '';
+                    }
+                    else if(lecture_name_set.split(')').length>1){
+                      lecture_name_tmp = lecture_name_set.split('(')[0];
+                      lecture_name = lecture_name_tmp.substring(1,lecture_name_tmp.length-1);
+                      lecture_link_tmp = lecture_name_set.split(']')[1];
+                      lecture_link = lecture_link_tmp.substring(1,lecture_link_tmp.length-1);
+                      lecture_fileid = lecture_link.split('?')[1].split('&')[0].split('=')[1];
+                      //console.log(lecture_fildid);
+                    }else{
+                      lecture_name = lecture_name_set;
+                    }
+                    //console.log(lecture_link);
+                    $('.col-sm-12').append(lecture2html(lecture_name, lecture_fileid));
+                    break;
+                  case 2://section
+                    var section_name = item.split('#')[1];
+                    $('.col-sm-12').append(section2html(section_name));
+                    break;
+                  default:
+                }
+
+             }
            });
+           /*
            $.get(appCourses,
 
                {
@@ -82,7 +113,7 @@ var course_id = window.location.search.split("?")[1].split("=")[1];
                    "command":"commandGetCourseInfo"
                },
              function (data) {
-               console.log("the result is :"+data);
+               //console.log("the result is :"+data);
 
                var CourseInfoSet = data.split('||');
                var CourseName = CourseInfoSet.shift();
@@ -114,6 +145,7 @@ var course_id = window.location.search.split("?")[1].split("=")[1];
                //   console.log(html_content);
                //$('#content').html(html_content);
              });
+             */
 });
 var section2html = function(section_name){
   var content = "";
@@ -126,18 +158,17 @@ var section2html = function(section_name){
 ";
 return content;
 }
-var lecture2html = function(lecture_name){
+var lecture2html = function(lecture_name, lecture_id){
   var content = "";
   content+="<ul class=\'section-list\'>\
         <li class=\'section-item incomplete\'>\
-          <a class='item' data-no-turbolink=\'true\'>\
+          <a href=\'javascript:load_content(";
+          content+=lecture_id;
+          content+=")\' class='item' data-no-turbolink=\'true\'>\
             <span class=\'status-container\'>\
               <span class=\'status-icon\'>&nbsp;</span>\
             </span>\
             <div class=\'title-container\'>\
-              <span class=\'lecture-icon\'>\
-                <i class=\'fa fa-file-text\'></i>\
-              </span>\
               <span class=\'lecture-name\'>";
               content+=lecture_name;
               content+="</span>\
@@ -147,4 +178,11 @@ var lecture2html = function(lecture_name){
       </ul>\
 ";
 return content;
+}
+
+var load_content = function(fileid){
+
+  if(typeof fileid != "undefined"){
+    console.log(fileid);
+  }
 }

@@ -15,22 +15,33 @@ $(document).ready(function(){
              },
            function (data) {
 				//console.log(data);
-				var courses_text = data;
-				var courses_set = courses_text.split('||');
-				courses_set.pop();
-				for(course_id in courses_set){
-					var course = courses_set[course_id];
-					console.log(course);
-					var course_name = course.split('$$')[0];
-					var course_id = course.split('$$')[1];
-					var course_description = course.split('$$')[2];
-					var course_icon = course.split('$$')[3];
-					$('#course_div').append(var2content(course_name, course_id, course_description, course_icon));
-				}
+
            });
+           $.get(appFiles,
+
+               {
+                   "command":"commandGetCourses"
+               },
+             function (data) {
+               console.log(data);
+               var courses_text = data;
+               var courses_set = courses_text.split('||');
+               courses_set.pop();
+               for(course_id in courses_set){
+                 var course = courses_set[course_id];
+                 console.log(course);
+                 var course_id = course.split('$$')[0];
+                var course_name = course.split('$$')[1];
+                 var course_icon = course.split('$$')[2];
+                 console.log(course_icon);
+                 $('#course_div').append(var2content(course_name, course_id, course_icon));
+               }
+           }
+             );
+
 });
 
-var var2content = function(course_name, course_id, course_description, course_icon){
+var var2content = function(course_name, course_id, course_icon){
 	var tmp_text = "<div class=\'col-xs-12 col-sm-6 col-md-4\'>\
 	<div class=\'course-listing\' >\
 		<div class=\'row\'>\
@@ -52,9 +63,8 @@ var var2content = function(course_name, course_id, course_description, course_ic
 					</div>\
           </div>\
           <div class=\'course-listing-subtitle\'>";
-		  
-          tmp_text+=course_description;
-		  
+
+
           tmp_text+="</div>\
         </div>\
       </a>\
