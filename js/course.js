@@ -56,7 +56,6 @@ function md2html(input_content) {
 
 $(document).ready(function(){
 $('#diagram').hide();
-$('#content').html("loading...");
 var course_id = window.location.search.split("?")[1].split("=")[1];
          //console.log(course_id);
 
@@ -183,6 +182,21 @@ return content;
 var load_content = function(fileid){
 
   if(typeof fileid != "undefined"){
-    console.log(fileid);
+	  $('#content').html("loading..");
+	  $('#blog_title').html("");
+		$.get(appBlogs,
+
+             {
+                 FileID:fileid,
+                 "command":"read"
+             },
+           function (data) {
+			   console.log(data);
+             title = data.split('$$')[0];
+             content = data.split('$$')[1];
+             var html_content = md2html(content,html_content);
+             $('#blog_title').html(title);
+             $('#content').html(html_content);
+           });
   }
 }

@@ -34,7 +34,7 @@ $(document).ready(function(){
                 var course_name = course.split('$$')[1];
                  var course_icon = course.split('$$')[2];
                  console.log(course_icon);
-                 $('#course_div').append(var2content(course_name, course_id, course_icon));
+                 $('#course_div').prepend(var2content(course_name, course_id, course_icon));
                }
            }
              );
@@ -43,11 +43,12 @@ $(document).ready(function(){
 
 var var2content = function(course_name, course_id, course_icon){
 	var tmp_text = "<div class=\'col-xs-12 col-sm-6 col-md-4\'>\
-	<div class=\'course-listing\' >\
-		<div class=\'row\'>\
-			<a href=\"";
+	<a href=\"";
 			tmp_text+="course.html?CourseID="+course_id;
 			tmp_text+="\" data-role=\"course-box-link\ \" target=\"__blank\">\
+	<div class=\'course-listing\' >\
+		<div class=\'row\'>\
+			\
 				<div class=\'col-lg-12\'>\
 					<div class=\'course-box-image-container\'>\
 						<img class=\'course-box-image\' src=\'";
@@ -67,7 +68,7 @@ var var2content = function(course_name, course_id, course_icon){
 
           tmp_text+="</div>\
         </div>\
-      </a>\
+      \
     </div>\
     <div class=\'course-listing-extra-info col-xs-12\'>\
       <div class=\'pull-left\'>\
@@ -78,7 +79,7 @@ var var2content = function(course_name, course_id, course_icon){
       </div>\
       \
 \
-    </div></div></div>\
+    </div></div></a></div>\
 ";
 return tmp_text;
 }
